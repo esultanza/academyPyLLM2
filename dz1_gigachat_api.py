@@ -4,7 +4,7 @@ import uuid
 import time
 import creds
 
-
+# https://developers.sber.ru/docs/ru/gigachat/individuals-quickstart?tool=python
 def get_tokens():
     url = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 
@@ -17,20 +17,17 @@ def get_tokens():
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    return response.json()
+    return response.json()["access_token"]
 
 
 def text_generate():
     url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
-    get_token = str(get_tokens()["access_token"])
-
     payload = json.dumps({
         "model": "GigaChat",
         "messages": [
             {
                 "role": "user",
-                "content": "Расскажи, о чем 'Марш энтузиастов'"
-                # "content": "Расскажи, о чем пели в СССР"
+                "content": "Расскажи, какими смыслами были наполнены песни в СССР"
             }
         ],
         "temperature": 1,
@@ -43,13 +40,13 @@ def text_generate():
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': f'Bearer {get_token})'
+        'Authorization': f'Bearer {get_tokens()}'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload).json()
     print(response["choices"][0]["message"]["content"])
 
-
+# платно
 def create_embeddings():
     url = "https://gigachat.devices.sberbank.ru/api/v1/embeddings"
     payload = json.dumps({
@@ -61,11 +58,10 @@ def create_embeddings():
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer <токен_доступа>'
+        'Authorization': f'Bearer {get_tokens()}'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-
     print(response.text)
 
 
