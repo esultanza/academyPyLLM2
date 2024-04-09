@@ -16,8 +16,8 @@ def get_tokens():
         'Authorization': f'Basic {creds.authorize_data}'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-    return response.json()["access_token"]
+    response = requests.request("POST", url, headers=headers, data=payload).json()
+    return response["access_token"]
 
 
 def text_generate():
@@ -45,24 +45,6 @@ def text_generate():
 
     response = requests.request("POST", url, headers=headers, data=payload).json()
     print(response["choices"][0]["message"]["content"])
-
-# платно
-def create_embeddings():
-    url = "https://gigachat.devices.sberbank.ru/api/v1/embeddings"
-    payload = json.dumps({
-        "model": "Embeddings",
-        "input": [
-            "Расскажи о современных технологиях"
-        ]
-    })
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': f'Bearer {get_tokens()}'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    print(response.text)
 
 
 if __name__ == '__main__':
