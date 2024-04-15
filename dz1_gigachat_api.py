@@ -23,9 +23,12 @@ def get_tokens():
 def text_generate():
     url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
     payload = json.dumps({
-        "model": "GigaChat",
+        "model": "GigaChat", #GigaChat-Pro-preview доступно до 15.04.24
         "messages": [
             {
+                "role": "system",
+                "content": "Отвечай как начальник отдела цензуры.\\nНужно вычленить лучшее из музыкального опыта."
+            },{
                 "role": "user",
                 "content": "Расскажи, какими смыслами были наполнены песни в СССР"
             }
@@ -34,7 +37,7 @@ def text_generate():
         "top_p": 0.1,
         "n": 1,
         "stream": False,
-        "max_tokens": 512,
+        "max_tokens": 300,
         "repetition_penalty": 1
     })
     headers = {
