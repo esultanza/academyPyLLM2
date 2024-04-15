@@ -22,33 +22,44 @@ def get_tokens():
 
 def text_generate():
     url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
+    conversation_history=[
+        {
+            "role": "system",
+            "content": "Отвечай как начальник отдела коммунистической цензуры."
+        },{
+            "role": "user",
+            "content": "Расскажи, какими смыслами были наполнены песни в СССР.\\nПриведи редкие примеры песен."
+        }
+    ]
     payload = json.dumps({
         "model": "GigaChat",
-        "messages": [
-            {
-                "role": "system",
-                "content": "Отвечай как большой поклонник ретро-музыки.\\nНужно вычленить лучшее из музыкального опыта с приведением примеров."
-            },{
-                "role": "user",
-                "content": "Расскажи, какими смыслами были наполнены песни в СССР."
-            }
-        ],
-        "temperature": 1,
-        "top_p": 0.1,
-        "n": 1,
-        "stream": False,
-        "max_tokens": 300,
-        "repetition_penalty": 1
+        "messages": conversation_history,
+        "temperature": 1,  # Температура генерации
+        "top_p": 0.4,  # Параметр top_p для контроля разнообразия ответов
+        "n": 1,  # Количество возвращаемых ответов
+        "stream": False,  # Потоковая ли передача ответов
+        "max_tokens": 200,  # Максимальное количество токенов в ответе
+        "repetition_penalty": 1,  # Штраф за повторения
+        "update_interval": 0  # Интервал обновления (для потоковой передачи)
     })
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': f'Bearer {get_tokens()}'
     }
-
-    response = requests.request("POST", url, headers=headers, data=payload).json()
-    print(response["choices"][0]["message"]["content"])
-
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload).json()
+        response_content=response["choices"][0]["message"]["content"]
+        print(response_content)
+        # Добавление ответа модели в историю диалога
+        conversation_history.append({
+            "role": "assistant",
+            "content": response_content
+        })
+    except requests.RequestException as e:
+        # Обработка исключения в случае ошибки запроса
+        print(f"Произошла ошибка: {str(e)}")
+        return None, conversation_history
 
 if __name__ == '__main__':
     text_generate()
